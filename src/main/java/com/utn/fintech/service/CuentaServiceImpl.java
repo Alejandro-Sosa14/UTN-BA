@@ -4,6 +4,8 @@ import com.utn.fintech.dto.CuentaRequestDTO;
 import com.utn.fintech.dto.CuentaResponseDTO;
 import com.utn.fintech.dto.DolarMepDTO;
 import com.utn.fintech.exception.CuentaNoEncontradaException;
+import com.utn.fintech.exception.TipoCuentaInvalidoException;
+import com.utn.fintech.exception.UsuarioNoEncontradoException;
 import com.utn.fintech.model.*;
 import com.utn.fintech.repository.CuentaRepository;
 import com.utn.fintech.repository.UsuarioRepository;
@@ -51,7 +53,7 @@ public class CuentaServiceImpl implements CuentaService {
     public CuentaResponseDTO crearCuenta(CuentaRequestDTO request) {
         // Busco el usuario
         Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + request.getUsuarioId()));
+                .orElseThrow(() -> new UsuarioNoEncontradoException(request.getUsuarioId()));
 
         // Obtengo la cotizacion del dolar MEP
         DolarMepDTO cotizacion = dolarApiClient.obtenerCotizacionMEP();
@@ -67,11 +69,8 @@ public class CuentaServiceImpl implements CuentaService {
         } else if ("CORRIENTE".equalsIgnoreCase(request.getTipoCuenta())) {
             cuenta = new CuentaCorriente(numeroCuenta, request.getSaldoUSD(), usuario, request.getDescubierto());
         } else {
-            throw new RuntimeException("Tipo de cuenta invalido. Usar AHORRO o CORRIENTE");
+            throw new TipoCuentaInvalidoException(request.getTipoCuenta());
         }
-
-        // Calculo el saldo en ARS usando la interfaz Convertible
-        cuenta.setSaldoARS(cuenta.convertirARS(tasaCompra));
 
         cuentaRepository.save(cuenta);
         return mapearAResponse(cuenta, tasaCompra);
@@ -86,7 +85,6 @@ public class CuentaServiceImpl implements CuentaService {
         double tasaCompra = cotizacion.getCompra();
 
         cuenta.setSaldoUSD(request.getSaldoUSD());
-        cuenta.setSaldoARS(cuenta.convertirARS(tasaCompra));
 
         cuentaRepository.save(cuenta);
         return mapearAResponse(cuenta, tasaCompra);
@@ -102,7 +100,6 @@ public class CuentaServiceImpl implements CuentaService {
 
     // Metodo auxiliar para convertir una Cuenta en un DTO de respuesta
     private CuentaResponseDTO mapearAResponse(Cuenta cuenta, double tasaCompra) {
-        String tipoCuenta = cuenta instanceof CuentaAhorro ? "AHORRO" : "CORRIENTE";
         String nombreUsuario = cuenta.getUsuario() != null
                 ? cuenta.getUsuario().getNombre() + " " + cuenta.getUsuario().getApellido()
                 : "Sin usuario";
@@ -110,7 +107,7 @@ public class CuentaServiceImpl implements CuentaService {
         return new CuentaResponseDTO(
                 cuenta.getId(),
                 cuenta.getNumeroCuenta(),
-                tipoCuenta,
+                cuenta.getTipo(),
                 cuenta.getSaldoUSD(),
                 cuenta.convertirARS(tasaCompra),
                 tasaCompra,

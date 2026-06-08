@@ -16,6 +16,9 @@ public class CuentaAhorro extends Cuenta {
         this.limiteExtraccionDiario = limiteExtraccionDiario;
     }
 
+    @Override
+    public String getTipo() { return "AHORRO"; }
+
     public double getLimiteExtraccionDiario() { return limiteExtraccionDiario; }
     public void setLimiteExtraccionDiario(double limiteExtraccionDiario) { this.limiteExtraccionDiario = limiteExtraccionDiario; }
 }

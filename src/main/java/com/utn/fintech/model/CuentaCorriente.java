@@ -16,6 +16,9 @@ public class CuentaCorriente extends Cuenta {
         this.descubierto = descubierto;
     }
 
+    @Override
+    public String getTipo() { return "CORRIENTE"; }
+
     public double getDescubierto() { return descubierto; }
     public void setDescubierto(double descubierto) { this.descubierto = descubierto; }
 }

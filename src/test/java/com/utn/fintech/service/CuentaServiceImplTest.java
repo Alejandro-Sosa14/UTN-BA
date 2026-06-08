@@ -4,6 +4,8 @@ import com.utn.fintech.dto.CuentaRequestDTO;
 import com.utn.fintech.dto.CuentaResponseDTO;
 import com.utn.fintech.dto.DolarMepDTO;
 import com.utn.fintech.exception.CuentaNoEncontradaException;
+import com.utn.fintech.exception.TipoCuentaInvalidoException;
+import com.utn.fintech.exception.UsuarioNoEncontradoException;
 import com.utn.fintech.model.CuentaAhorro;
 import com.utn.fintech.model.Usuario;
 import com.utn.fintech.repository.CuentaRepository;
@@ -48,7 +50,6 @@ class CuentaServiceImplTest {
 
         cuentaMock = new CuentaAhorro("CBU-ABC123", 1000.0, usuarioMock, 500.0);
         cuentaMock.setId(1L);
-        cuentaMock.setSaldoARS(1000.0 * 1200.0);
 
         cotizacionMock = new DolarMepDTO();
         cotizacionMock.setCompra(1200.0);
@@ -120,6 +121,31 @@ class CuentaServiceImplTest {
         cuentaService.eliminarCuenta(1L);
 
         verify(cuentaRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void crearCuenta_usuarioInexistente_deberiaLanzarExcepcion() {
+        CuentaRequestDTO request = new CuentaRequestDTO();
+        request.setTipoCuenta("AHORRO");
+        request.setSaldoUSD(500.0);
+        request.setUsuarioId(99L);
+
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(UsuarioNoEncontradoException.class, () -> cuentaService.crearCuenta(request));
+    }
+
+    @Test
+    void crearCuenta_tipoInvalido_deberiaLanzarExcepcion() {
+        CuentaRequestDTO request = new CuentaRequestDTO();
+        request.setTipoCuenta("PLAZO_FIJO");
+        request.setSaldoUSD(500.0);
+        request.setUsuarioId(1L);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioMock));
+        when(dolarApiClient.obtenerCotizacionMEP()).thenReturn(cotizacionMock);
+
+        assertThrows(TipoCuentaInvalidoException.class, () -> cuentaService.crearCuenta(request));
     }
 }
 

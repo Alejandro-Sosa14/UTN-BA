@@ -1,6 +1,7 @@
 package com.utn.fintech.service;
 
 import com.utn.fintech.dto.DolarMepDTO;
+import com.utn.fintech.exception.DolarApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,9 +22,14 @@ public class DolarApiClientImpl implements DolarApiClient {
     public DolarMepDTO obtenerCotizacionMEP() {
         try {
             DolarMepDTO cotizacion = restTemplate.getForObject(dolarApiUrl, DolarMepDTO.class);
+            if (cotizacion == null) {
+                throw new DolarApiException("La respuesta de DolarAPI vino vacia", null);
+            }
             return cotizacion;
+        } catch (DolarApiException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo obtener la cotizacion del dolar MEP: " + e.getMessage());
+            throw new DolarApiException(e.getMessage(), e);
         }
     }
 }

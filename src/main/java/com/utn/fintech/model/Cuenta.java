@@ -16,7 +16,11 @@ public abstract class Cuenta implements Convertible {
 
     private String numeroCuenta;
     private double saldoUSD;
+
+    // No se persiste: se calcula al consultar usando la cotizacion MEP actual
+    @Transient
     private double saldoARS;
+
     private LocalDate fechaCreacion;
 
     // Muchas cuentas pertenecen a un usuario
@@ -32,6 +36,9 @@ public abstract class Cuenta implements Convertible {
         this.usuario = usuario;
         this.fechaCreacion = LocalDate.now();
     }
+
+    // Cada subclase define su tipo, asi evitamos hacer instanceof en el service
+    public abstract String getTipo();
 
     // Implementacion del metodo de la interfaz Convertible
     @Override

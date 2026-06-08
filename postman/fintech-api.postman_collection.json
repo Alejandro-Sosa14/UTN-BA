@@ -1,0 +1,105 @@
+{
+  "info": {
+    "name": "Fintech API - UTN",
+    "description": "Coleccion de endpoints para la API Fintech (TP Clase 14 - Diplomatura UTN).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Listar cuentas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cuentas",
+          "host": ["{{baseUrl}}"],
+          "path": ["cuentas"]
+        }
+      }
+    },
+    {
+      "name": "Obtener cuenta por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cuentas/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["cuentas", "1"]
+        }
+      }
+    },
+    {
+      "name": "Crear cuenta AHORRO",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoUSD\": 1000.0,\n  \"usuarioId\": 1,\n  \"limiteExtraccionDiario\": 500.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cuentas",
+          "host": ["{{baseUrl}}"],
+          "path": ["cuentas"]
+        }
+      }
+    },
+    {
+      "name": "Crear cuenta CORRIENTE",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipoCuenta\": \"CORRIENTE\",\n  \"saldoUSD\": 2500.0,\n  \"usuarioId\": 1,\n  \"descubierto\": 1000.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cuentas",
+          "host": ["{{baseUrl}}"],
+          "path": ["cuentas"]
+        }
+      }
+    },
+    {
+      "name": "Actualizar cuenta",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoUSD\": 1500.0,\n  \"usuarioId\": 1,\n  \"limiteExtraccionDiario\": 500.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cuentas/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["cuentas", "1"]
+        }
+      }
+    },
+    {
+      "name": "Eliminar cuenta",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/cuentas/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["cuentas", "1"]
+        }
+      }
+    }
+  ]
+}
